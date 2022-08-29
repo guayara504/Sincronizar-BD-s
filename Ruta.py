@@ -5,7 +5,6 @@ import sys
 import time
 import os
 from datetime import datetime
-import pyexcel
 import xlwt
 
 class rutaCiudad:
