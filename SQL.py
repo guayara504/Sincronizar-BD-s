@@ -2,13 +2,13 @@ import mysql.connector as sql
 import msvcrt
 import time
 from Ruta import *
-
+import colorama
 ruta = rutaCiudad()
 dia = time.strftime("%d")
 mes = time.strftime("%m")
 ano = time.strftime("%Y")
 ruta.crear_carpetas(dia=dia, mes=mes)
-
+colorama.init()
 
 conexion1 = sql.connect(
             host = "192.168.0.19", 
@@ -23,11 +23,11 @@ conexion2 = sql.connect(
 
 fecha = time.strftime("%Y-%m-%d")
 fechaSegundos = time.strftime("%d-%m-%Y-(%H-%M-%S)")
-print (fecha)
+print (colorama.Fore.YELLOW+"\n",fecha)
 
 
-print("-"*15)
-print("GENERADOR SQL")
+print(colorama.Fore.RESET+"-"*37)
+print(colorama.Fore.CYAN+"\tGENERADOR SQL")
 cursor1 = conexion1.cursor()
 cursor1.execute(f"select * from z04_estado WHERE fecha_ingreso = '{fecha}' AND sincronizado = 0")
 consultasBD  = [item for item in cursor1.fetchall()]
@@ -39,6 +39,7 @@ else:
     updateRemotaInsert = []
     updateRemotaUpdate = []
     updateRemotaInsert.append("INSERT INTO z04_estado (z01_radicacion_juzgado, z01_radicacion_z01_radicacion, demandante, demandado, notificacion, fecha_notificacion, clase_proceso, folio, cuaderno, ciudad) VALUES ")
+    updateRemotaUpdate.append("UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_abogado.leido = 1 WHERE ")
     for consultaBD in consultasBD:  
       id_z04.append(consultaBD[0])
       juzgado = consultaBD[1]
@@ -57,16 +58,16 @@ UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_ab
 
 
       updateRemotaInsert.append(f"('{juzgado}','{radicacion}', '{demandante}', '{demandado}', '{notificacion}','{fecha_notificacion}','{clase_proceso}','{folio}','{cuaderno}','{ciudad}'),")
-      updateRemotaUpdate.append(f"UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_abogado.leido = 1 WHERE z01_radicacion_has_z02_abogado.z01_radicacion_z01_radicacion = '{radicacion}' AND z01_radicacion_has_z02_abogado.ciudad='{ciudad}' AND z01_radicacion_has_z02_abogado.z01_radicacion_juzgado = '{juzgado}' AND z01_radicacion_has_z02_abogado.z02_abogado_idcedula_z02=z02_abogado.idcedula_z02 AND z02_abogado.estado=1")      
+      updateRemotaUpdate.append(f"(z01_radicacion_has_z02_abogado.z01_radicacion_z01_radicacion = '{radicacion}' AND z01_radicacion_has_z02_abogado.ciudad='{ciudad}' AND z01_radicacion_has_z02_abogado.z01_radicacion_juzgado = '{juzgado}' AND z01_radicacion_has_z02_abogado.z02_abogado_idcedula_z02=z02_abogado.idcedula_z02 AND z02_abogado.estado=1) OR ")      
 with open(f'.\\{ruta.dife_fecha()}\\{dia}\\{fechaSegundos}.txt','w') as temp_file:
     for item in consultatxt:
         temp_file.write("%s\n" % item)
 file = open(f'.\\{ruta.dife_fecha()}\\{dia}\\{fechaSegundos}.txt', 'r')
-print(file.read())
        
 id_z04 =tuple(id_z04)
-print("-"*15)
-print(id_z04,"---",len(id_z04))
+print(colorama.Fore.RESET+"-"*37)
+print(colorama.Fore.GREEN+"Lineas Consultadas: ",len(id_z04))
+print(colorama.Fore.RESET+"-"*37)
 
 
 cursor1.execute(f"UPDATE z04_estado SET sincronizado = 1 WHERE id_z04_estado  IN {id_z04}")
@@ -74,26 +75,32 @@ cursor1.close()
 
 
 
-print("\nSubiendo\n----------------")
-print("Insertando Lineas...")
+print(colorama.Fore.CYAN+"\tSINCRONIZANDO")
+print(colorama.Fore.RESET+"-"*37)
+print(colorama.Fore.GREEN+"Insertando Lineas:")
+print(colorama.Fore.RESET+"-"*37)
 
 cursor2 = conexion2.cursor()
 updateRemotaInsert = "".join(updateRemotaInsert)
 updateRemotaInsert = updateRemotaInsert[:-1]
+
+updateRemotaUpdate = "".join(updateRemotaUpdate)
+updateRemotaUpdate = updateRemotaUpdate[:-3]
+
 cursor2.execute(updateRemotaInsert)
-print("¡Lineas Insertadas!")
-n=0
-print("Ejecutando UPDATE")
-for consulta in updateRemotaUpdate:
-    n+=1
-    print("Proceso: ",n)
-    cursor2.execute(consulta)
-print("UPDATE Ejecutado\n-----------------\n")
+
+print(colorama.Fore.YELLOW+"¡Lineas Insertadas!")
+print(colorama.Fore.RESET+"-"*37)
+print(colorama.Fore.GREEN+"Ejecutando UPDATE:")
+print(colorama.Fore.RESET+"-"*37)
+cursor2.execute(updateRemotaUpdate)
+print(colorama.Fore.YELLOW+"¡Tablas Actualizadas!")
+print(colorama.Fore.RESET+"-"*37)
 
 
 
 
-print("--Consulta hecha con exito--")
-print("-"*15)
-print("--Presione una tecla para cerrar--")
+print(colorama.Fore.GREEN+"Sincronización hecha correctamente",colorama.Fore.YELLOW+" \2")
+print(colorama.Fore.RESET+"-"*37)
+print(colorama.Fore.CYAN+"Presione una tecla para cerrar")
 msvcrt.getch()
