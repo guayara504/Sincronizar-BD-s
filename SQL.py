@@ -3,6 +3,7 @@ import msvcrt
 import time
 from Ruta import *
 import colorama
+from tabulate import tabulate
 ruta = rutaCiudad()
 dia = time.strftime("%d")
 mes = time.strftime("%m")
@@ -102,5 +103,25 @@ print(colorama.Fore.RESET+"-"*37)
 
 print(colorama.Fore.GREEN+"Sincronización hecha correctamente",colorama.Fore.YELLOW+" \2")
 print(colorama.Fore.RESET+"-"*37)
+
+print(colorama.Fore.GREEN+"\nEjecutando Diferencia BD's:")
+
+cursor1 = conexion1.cursor()
+cursor1.execute(f"SELECT COUNT(id_z04_estado) FROM z04_estado WHERE fecha_notificacion = CURDATE()")
+totalLocal  = [item for item in cursor1.fetchall()]
+cursor1.close()
+
+cursor2 = conexion2.cursor()
+cursor2.execute(f"SELECT COUNT(id_z04_estado) FROM z04_estado WHERE fecha_notificacion = CURDATE()")
+totalRemota  = [item for item in cursor2.fetchall()]
+cursor2.close()
+
+diferencia = int(totalLocal[0][0]) - (totalRemota[0][0])
+
+dif = [[totalRemota[0][0],totalLocal[0][0],diferencia]]
+header = ["TotalRemota","TotalLocal","Diferencia"]
+print(colorama.Fore.YELLOW+"\n",tabulate(dif,header,tablefmt='fancy_grid'))
+
+
 print(colorama.Fore.CYAN+"Presione una tecla para cerrar")
 msvcrt.getch()
