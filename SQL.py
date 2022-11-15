@@ -33,76 +33,77 @@ cursor1 = conexion1.cursor()
 cursor1.execute(f"select * from z04_estado WHERE fecha_ingreso = '{fecha}' AND sincronizado = 0")
 consultasBD  = [item for item in cursor1.fetchall()]
 if len(consultasBD) == 0:
-    print("No hay procesos")
+    print(colorama.Fore.YELLOW+"\nNo hay procesos insertados")
+
 else:
-    id_z04 = []
-    consultatxt = []
-    updateRemotaInsert = []
-    updateRemotaUpdate = []
-    updateRemotaInsert.append("INSERT INTO z04_estado (z01_radicacion_juzgado, z01_radicacion_z01_radicacion, demandante, demandado, notificacion, fecha_notificacion, clase_proceso, folio, cuaderno, ciudad) VALUES ")
-    updateRemotaUpdate.append("UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_abogado.leido = 1 WHERE ")
-    for consultaBD in consultasBD:  
-      id_z04.append(consultaBD[0])
-      juzgado = consultaBD[1]
-      radicacion = consultaBD[2]
-      demandante = consultaBD[3] 
-      demandado = consultaBD[4]
-      notificacion = consultaBD[5]
-      fecha_notificacion = consultaBD[6]
-      clase_proceso = consultaBD[7]
-      folio = consultaBD[8]
-      cuaderno = consultaBD[9]
-      ciudad = consultaBD[13]
-      
-      consultatxt.append(f"""INSERT INTO z04_estado (z01_radicacion_juzgado, z01_radicacion_z01_radicacion, demandante, demandado, notificacion, fecha_notificacion, clase_proceso, folio, cuaderno, ciudad) VALUES ('{juzgado}','{radicacion}', '{demandante}', '{demandado}', '{notificacion}','{fecha_notificacion}','{clase_proceso}','{folio}','{cuaderno}','{ciudad}')
-UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_abogado.leido = 1 WHERE z01_radicacion_has_z02_abogado.z01_radicacion_z01_radicacion = '{radicacion}' AND z01_radicacion_has_z02_abogado.ciudad='{ciudad}' AND z01_radicacion_has_z02_abogado.z01_radicacion_juzgado = '{juzgado}' AND z01_radicacion_has_z02_abogado.z02_abogado_idcedula_z02=z02_abogado.idcedula_z02 AND z02_abogado.estado=1""")
+        id_z04 = []
+        consultatxt = []
+        updateRemotaInsert = []
+        updateRemotaUpdate = []
+        updateRemotaInsert.append("INSERT INTO z04_estado (z01_radicacion_juzgado, z01_radicacion_z01_radicacion, demandante, demandado, notificacion, fecha_notificacion, clase_proceso, folio, cuaderno, ciudad) VALUES ")
+        updateRemotaUpdate.append("UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_abogado.leido = 1 WHERE ")
+        for consultaBD in consultasBD:  
+            id_z04.append(consultaBD[0])
+            juzgado = consultaBD[1]
+            radicacion = consultaBD[2]
+            demandante = consultaBD[3] 
+            demandado = consultaBD[4]
+            notificacion = consultaBD[5]
+            fecha_notificacion = consultaBD[6]
+            clase_proceso = consultaBD[7]
+            folio = consultaBD[8]
+            cuaderno = consultaBD[9]
+            ciudad = consultaBD[13]
+            
+            consultatxt.append(f"""INSERT INTO z04_estado (z01_radicacion_juzgado, z01_radicacion_z01_radicacion, demandante, demandado, notificacion, fecha_notificacion, clase_proceso, folio, cuaderno, ciudad) VALUES ('{juzgado}','{radicacion}', '{demandante}', '{demandado}', '{notificacion}','{fecha_notificacion}','{clase_proceso}','{folio}','{cuaderno}','{ciudad}')
+        UPDATE z01_radicacion_has_z02_abogado, z02_abogado SET z01_radicacion_has_z02_abogado.leido = 1 WHERE z01_radicacion_has_z02_abogado.z01_radicacion_z01_radicacion = '{radicacion}' AND z01_radicacion_has_z02_abogado.ciudad='{ciudad}' AND z01_radicacion_has_z02_abogado.z01_radicacion_juzgado = '{juzgado}' AND z01_radicacion_has_z02_abogado.z02_abogado_idcedula_z02=z02_abogado.idcedula_z02 AND z02_abogado.estado=1""")
 
 
-      updateRemotaInsert.append(f"('{juzgado}','{radicacion}', '{demandante}', '{demandado}', '{notificacion}','{fecha_notificacion}','{clase_proceso}','{folio}','{cuaderno}','{ciudad}'),")
-      updateRemotaUpdate.append(f"(z01_radicacion_has_z02_abogado.z01_radicacion_z01_radicacion = '{radicacion}' AND z01_radicacion_has_z02_abogado.ciudad='{ciudad}' AND z01_radicacion_has_z02_abogado.z01_radicacion_juzgado = '{juzgado}' AND z01_radicacion_has_z02_abogado.z02_abogado_idcedula_z02=z02_abogado.idcedula_z02 AND z02_abogado.estado=1) OR ")      
-with open(f'.\\{ruta.dife_fecha()}\\{dia}\\{fechaSegundos}.txt','w') as temp_file:
-    for item in consultatxt:
-        temp_file.write("%s\n" % item)
-file = open(f'.\\{ruta.dife_fecha()}\\{dia}\\{fechaSegundos}.txt', 'r')
-       
-id_z04 =tuple(id_z04)
-print(colorama.Fore.RESET+"-"*37)
-print(colorama.Fore.GREEN+"Lineas Consultadas: ",len(id_z04))
-print(colorama.Fore.RESET+"-"*37)
+            updateRemotaInsert.append(f"('{juzgado}','{radicacion}', '{demandante}', '{demandado}', '{notificacion}','{fecha_notificacion}','{clase_proceso}','{folio}','{cuaderno}','{ciudad}'),")
+            updateRemotaUpdate.append(f"(z01_radicacion_has_z02_abogado.z01_radicacion_z01_radicacion = '{radicacion}' AND z01_radicacion_has_z02_abogado.ciudad='{ciudad}' AND z01_radicacion_has_z02_abogado.z01_radicacion_juzgado = '{juzgado}' AND z01_radicacion_has_z02_abogado.z02_abogado_idcedula_z02=z02_abogado.idcedula_z02 AND z02_abogado.estado=1) OR ")      
+        with open(f'.\\{ruta.dife_fecha()}\\{dia}\\{fechaSegundos}.txt','w') as temp_file:
+            for item in consultatxt:
+                temp_file.write("%s\n" % item)
+        file = open(f'.\\{ruta.dife_fecha()}\\{dia}\\{fechaSegundos}.txt', 'r')
+            
+        id_z04 =tuple(id_z04)
+        print(colorama.Fore.RESET+"-"*37)
+        print(colorama.Fore.GREEN+"Lineas Consultadas: ",len(id_z04))
+        print(colorama.Fore.RESET+"-"*37)
 
 
-cursor1.execute(f"UPDATE z04_estado SET sincronizado = 1 WHERE id_z04_estado  IN {id_z04}")
-cursor1.close()
-
-
-
-print(colorama.Fore.CYAN+"\tSINCRONIZANDO")
-print(colorama.Fore.RESET+"-"*37)
-print(colorama.Fore.GREEN+"Insertando Lineas:")
-print(colorama.Fore.RESET+"-"*37)
-
-cursor2 = conexion2.cursor()
-updateRemotaInsert = "".join(updateRemotaInsert)
-updateRemotaInsert = updateRemotaInsert[:-1]
-
-updateRemotaUpdate = "".join(updateRemotaUpdate)
-updateRemotaUpdate = updateRemotaUpdate[:-3]
-
-cursor2.execute(updateRemotaInsert)
-
-print(colorama.Fore.YELLOW+"¡Lineas Insertadas!")
-print(colorama.Fore.RESET+"-"*37)
-print(colorama.Fore.GREEN+"Ejecutando UPDATE:")
-print(colorama.Fore.RESET+"-"*37)
-cursor2.execute(updateRemotaUpdate)
-print(colorama.Fore.YELLOW+"¡Tablas Actualizadas!")
-print(colorama.Fore.RESET+"-"*37)
+        cursor1.execute(f"UPDATE z04_estado SET sincronizado = 1 WHERE id_z04_estado  IN {id_z04}")
+        cursor1.close()
 
 
 
+        print(colorama.Fore.CYAN+"\tSINCRONIZANDO")
+        print(colorama.Fore.RESET+"-"*37)
+        print(colorama.Fore.GREEN+"Insertando Lineas:")
+        print(colorama.Fore.RESET+"-"*37)
 
-print(colorama.Fore.GREEN+"Sincronización hecha correctamente",colorama.Fore.YELLOW+" \2")
-print(colorama.Fore.RESET+"-"*37)
+        cursor2 = conexion2.cursor()
+        updateRemotaInsert = "".join(updateRemotaInsert)
+        updateRemotaInsert = updateRemotaInsert[:-1]
+
+        updateRemotaUpdate = "".join(updateRemotaUpdate)
+        updateRemotaUpdate = updateRemotaUpdate[:-3]
+
+        cursor2.execute(updateRemotaInsert)
+
+        print(colorama.Fore.YELLOW+"¡Lineas Insertadas!")
+        print(colorama.Fore.RESET+"-"*37)
+        print(colorama.Fore.GREEN+"Ejecutando UPDATE:")
+        print(colorama.Fore.RESET+"-"*37)
+        cursor2.execute(updateRemotaUpdate)
+        print(colorama.Fore.YELLOW+"¡Tablas Actualizadas!")
+        print(colorama.Fore.RESET+"-"*37)
+
+
+
+
+        print(colorama.Fore.GREEN+"Sincronización hecha correctamente",colorama.Fore.YELLOW+" \2")
+        print(colorama.Fore.RESET+"-"*37)
 
 print(colorama.Fore.GREEN+"\nEjecutando Diferencia BD's:")
 
